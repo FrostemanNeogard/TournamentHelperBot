@@ -6,6 +6,8 @@ const {
   ActionRowBuilder,
 } = require("discord.js");
 
+const { main_color } = require("../../config.json");
+
 module.exports = {
   name: "steaminvite",
   data: new SlashCommandBuilder()
@@ -31,26 +33,45 @@ module.exports = {
       );
     }
 
-    const BASE_URL = "http://127.0.0.1:5500/test.html?steamurl=" + steamURL;
+    const BASE_URL =
+      "https://frostemanneogard.github.io/uri-redirector/?uri=" + steamURL;
 
-    const responseEmbed = new EmbedBuilder().setFields({
-      name: "You have been invited to a steam lobby!",
-      value: " ",
-    });
+    const responseEmbed = new EmbedBuilder()
+      .setTitle("Steam Invitation")
+      .setColor(main_color)
+      .setFields({
+        name: "You have been invited to a steam lobby!",
+        value: " ",
+      });
 
-    console.log(BASE_URL);
     const joinButton = new ButtonBuilder()
       .setLabel("Join Lobby")
       .setURL(BASE_URL)
       .setStyle(ButtonStyle.Link);
 
-    const declineButton = new ButtonBuilder()
-      .setCustomId("decline")
-      .setLabel("Decline")
-      .setStyle(ButtonStyle.Secondary);
+    const row = new ActionRowBuilder().addComponents(joinButton);
+    const message = await interaction.reply({
+      embeds: [responseEmbed],
+      components: [row],
+    });
 
-    const row = new ActionRowBuilder().addComponents(joinButton, declineButton);
+    const collectorFilter = (i) => i.user.id === interaction.user.id;
 
-    await interaction.reply({ embeds: [responseEmbed], components: [row] });
+    const timeoutEmbed = new EmbedBuilder()
+      .setTitle("Steam Invitation")
+      .setColor(main_color)
+      .setFields({
+        name: "This invite has expired.",
+        value: " ",
+      });
+
+    try {
+      await message.awaitMessageComponent({
+        filter: collectorFilter,
+        time: 60_000,
+      });
+    } catch (e) {
+      await interaction.editReply({ embeds: [timeoutEmbed], components: [] });
+    }
   },
 };
