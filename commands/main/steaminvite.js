@@ -24,7 +24,6 @@ module.exports = {
   async execute(interaction) {
     const steamURL = interaction.options.getString("invitelink");
     const steamURLRegex = /^steam:\/\/joinlobby\/\d+\/\d+$/;
-
     const isSteamURLValid = steamURLRegex.test(steamURL);
 
     if (!isSteamURLValid) {
@@ -35,7 +34,6 @@ module.exports = {
 
     const BASE_URL =
       "https://frostemanneogard.github.io/uri-redirector/?uri=" + steamURL;
-
     const responseEmbed = new EmbedBuilder()
       .setTitle("Steam Invitation")
       .setColor(main_color)
@@ -43,20 +41,16 @@ module.exports = {
         name: "You have been invited to a steam lobby!",
         value: " ",
       });
-
     const joinButton = new ButtonBuilder()
       .setLabel("Join Lobby")
       .setURL(BASE_URL)
       .setStyle(ButtonStyle.Link);
-
     const row = new ActionRowBuilder().addComponents(joinButton);
     const message = await interaction.reply({
       embeds: [responseEmbed],
       components: [row],
     });
-
     const collectorFilter = (i) => i.user.id === interaction.user.id;
-
     const timeoutEmbed = new EmbedBuilder()
       .setTitle("Steam Invitation")
       .setColor(main_color)
