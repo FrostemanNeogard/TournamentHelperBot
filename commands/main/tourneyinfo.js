@@ -1,6 +1,11 @@
-const { SlashCommandBuilder } = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 
 const { main_color } = require("../../config.json");
+const {
+  getStartSlugFromStartURL,
+  getStartEventIdFromStartSlug,
+  getStartEntrantsFromEventId,
+} = require("../../util/functions");
 
 module.exports = {
   name: "tourneyinfo",
@@ -24,6 +29,22 @@ module.exports = {
       );
     }
 
-    return await interaction.reply("Start.gg URL is valid!");
+    const startSlug = getStartSlugFromStartURL(startURL);
+    const startEventId = await getStartEventIdFromStartSlug(startSlug);
+    const entrants = await getStartEntrantsFromEventId(startEventId);
+
+    const fields = entrants.map((player) => {
+      return {
+        name: player.placement.toString() ?? "?",
+        value: player.entrant.name ?? "?",
+      };
+    });
+
+    const responseEmbed = new EmbedBuilder()
+      .setColor(main_color)
+      .setTitle("TOP 8")
+      .setFields(fields);
+
+    return await interaction.reply({ embeds: [responseEmbed] });
   },
 };
