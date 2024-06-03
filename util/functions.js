@@ -40,4 +40,5 @@ const getSteamInviteLinkFromProfileURL = async (profileURL) => {
 module.exports = {
   getFiles,
   capitalizeFirstLetters,
+  getSteamInviteLinkFromProfileURL,
 };
