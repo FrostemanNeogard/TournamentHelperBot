@@ -1,5 +1,8 @@
 const fs = require("fs");
 const axios = require("axios");
+const fetch = require("node-fetch");
+const { start_api_url } = require("../config.json");
+
 require("dotenv").config();
 const STEAM_API_KEY = process.env.STEAM_API_KEY;
 
@@ -46,8 +49,81 @@ async function getSteamInviteLinkFromProfileURL(profileURL) {
   return `steam://joinlobby/${playerData.gameid}/${playerData.lobbysteamid}/${playerData.steamid}`;
 }
 
+function getStartSlugFromStartURL(startURL) {
+  const parsedUrl = new URL(startURL);
+  const path = parsedUrl.pathname.replace(/^\/|\/$/g, "");
+  return path;
+}
+
+async function getStartEventIdFromStartSlug(startSlug) {
+  const response = await fetch(start_api_url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + process.env.START_API_KEY,
+    },
+    body: JSON.stringify({
+      query: `
+      query getEventId($slug: String) {
+        event(slug: $slug) {
+          id
+          name
+        }
+      },`,
+      variables: {
+        slug: startSlug,
+      },
+    }),
+  });
+
+  const data = await response.json();
+  return data.data.event.id;
+}
+
+async function getStartEntrantsFromEventId(eventId) {
+  const response = await fetch(start_api_url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + process.env.START_API_KEY,
+    },
+    body: JSON.stringify({
+      query: `
+      query EventStandings($eventId: ID!, $page: Int!, $perPage: Int!) {
+        event(id: $eventId) {
+          id
+          name
+          standings(query: {
+            perPage: $perPage,
+            page: $page
+          }){
+            nodes {
+              placement
+              entrant {
+                id
+                name
+              }
+            }
+          }
+        }
+      }`,
+      variables: {
+        eventId: eventId,
+        page: "1",
+        perPage: "8",
+      },
+    }),
+  });
+
+  const data = await response.json();
+  return data.data.event.standings.nodes;
+}
+
 module.exports = {
   getFiles,
   capitalizeFirstLetters,
   getSteamInviteLinkFromProfileURL,
+  getStartSlugFromStartURL,
+  getStartEventIdFromStartSlug,
+  getStartEntrantsFromEventId,
 };
