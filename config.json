@@ -1,3 +1,5 @@
 {
-  "main_color": 56576
+  "main_color": 56576,
+  "warning_color": 16766208,
+  "danger_color": 14690344
 }
