@@ -32,7 +32,7 @@ module.exports = {
     ),
   async execute(interaction) {
     const steamURL = interaction.options.getString("profileurl");
-    const steamInviteURLRegex = /^steam:\/\/joinlobby\/\d+\/\d+$/;
+    const steamInviteURLRegex = /^steam:\/\/joinlobby\/\d+\/\d+\/\d+$/;
     const steamProfileURLRegex =
       /^https:\/\/steamcommunity\.com\/profiles\/\d+\/$/;
     const isValidInviteLink = steamInviteURLRegex.test(steamURL);
@@ -46,7 +46,9 @@ module.exports = {
 
     const inviteURL = isValidInviteLink
       ? steamURL
-      : getSteamInviteLinkFromProfileURL(steamURL);
+      : await getSteamInviteLinkFromProfileURL(steamURL);
+    const redirectURL =
+      "https://frostemanneogard.github.io/uri-redirector/?uri=" + inviteURL;
 
     const responseEmbed = new EmbedBuilder()
       .setTitle("Steam Invitation")
@@ -57,7 +59,7 @@ module.exports = {
       });
     const joinButton = new ButtonBuilder()
       .setLabel("Join Lobby")
-      .setURL(inviteURL)
+      .setURL(redirectURL)
       .setStyle(ButtonStyle.Link);
     const row = new ActionRowBuilder().addComponents(joinButton);
     const message = await interaction.reply({
