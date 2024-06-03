@@ -47,6 +47,13 @@ module.exports = {
     const inviteURL = isValidInviteLink
       ? steamURL
       : await getSteamInviteLinkFromProfileURL(steamURL);
+
+    if (inviteURL == null) {
+      return await interaction.reply(
+        "Something went wrong. Please make sure the user is in a joinable lobby."
+      );
+    }
+
     const redirectURL =
       "https://frostemanneogard.github.io/uri-redirector/?uri=" + inviteURL;
 
