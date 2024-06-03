@@ -3,11 +3,11 @@ const axios = require("axios");
 require("dotenv").config();
 const STEAM_API_KEY = process.env.STEAM_API_KEY;
 
-const getFiles = (path, ending) => {
+function getFiles(path, ending) {
   return fs.readdirSync(path).filter((f) => f.endsWith(ending));
-};
+}
 
-const capitalizeFirstLetters = (string) => {
+function capitalizeFirstLetters(string) {
   const words = string.split(" ");
   const output = [];
   for (let i = 0; i < words.length; i++) {
@@ -16,9 +16,9 @@ const capitalizeFirstLetters = (string) => {
     output.push(capitalizedWord);
   }
   return output.join(" ");
-};
+}
 
-const getSteamInviteLinkFromProfileURL = async (profileURL) => {
+async function getSteamInviteLinkFromProfileURL(profileURL) {
   const match = profileURL.match(
     /https:\/\/steamcommunity\.com\/profiles\/(\d+)\/$/
   );
@@ -44,7 +44,7 @@ const getSteamInviteLinkFromProfileURL = async (profileURL) => {
   }
 
   return `steam://joinlobby/${playerData.gameid}/${playerData.lobbysteamid}/${playerData.steamid}`;
-};
+}
 
 module.exports = {
   getFiles,
