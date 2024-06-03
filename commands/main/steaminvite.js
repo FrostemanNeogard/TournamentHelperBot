@@ -6,12 +6,8 @@ const {
   ActionRowBuilder,
 } = require("discord.js");
 
-const axios = require("axios");
-
 const { main_color } = require("../../config.json");
-
-require("dotenv").config();
-const STEAM_API_KEY = process.env.STEAM_API_KEY;
+const { getSteamInviteLinkFromProfileURL } = require("../../util/functions");
 
 module.exports = {
   name: "steaminvite",
@@ -20,59 +16,38 @@ module.exports = {
     .setDescription(
       `Creates a clickable button to accept a steam invite from a URL.`
     )
-    // .addStringOption((option) =>
-    //   option
-    //     .setName("invitelink")
-    //     .setDescription('The Steam invite link. Starts with "steam://"')
-    //     .setRequired(true)
-    // )
     .addStringOption((option) =>
       option
         .setName("profileurl")
-        .setDescription("Link to your steam profile.")
+        .setDescription(
+          "Link to either your steam profile or your game session."
+        )
         .setRequired(true)
     )
     .addBooleanOption((option) =>
       option
         .setName("neverexpire")
-        .setDescription(
-          "Decide if you want the invite to not expire after a minute."
-        )
+        .setDescription("Decide if you want the invite to never expire.")
         .setRequired(false)
     ),
   async execute(interaction) {
-    // const steamURL = interaction.options.getString("invitelink");
-    const steamURLRegex = /^steam:\/\/joinlobby\/\d+\/\d+$/;
-    const steamIPRegex = /^steam:\/\/connect\/(\d{1,3}\.){3}\d{1,3}:\d+$/;
-    // const isSteamURLValid = steamURLRegex.test(steamURL);
+    const steamURL = interaction.options.getString("profileurl");
+    const steamInviteURLRegex = /^steam:\/\/joinlobby\/\d+\/\d+$/;
+    const steamProfileURLRegex =
+      /^https:\/\/steamcommunity\.com\/profiles\/\d+\/$/;
+    const isValidInviteLink = steamInviteURLRegex.test(steamURL);
+    const isValidSteamLink = steamProfileURLRegex.test(steamURL);
 
-    // if (!isSteamURLValid) {
-    //   return await interaction.reply(
-    //     "Your steam URL appears to be invalid. Please double check the URL and try again."
-    //   );
-    // }
-
-    const neverExpire = interaction.options.getBoolean("neverexpire");
-    const profileURL = interaction.options.getString("profileurl");
-    const response = await axios.get(
-      `https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=${STEAM_API_KEY}&format=json&steamids=76561198202659223`
-    );
-    if (!response.status == 200) {
+    if (!isValidInviteLink && !isValidSteamLink) {
       return await interaction.reply(
-        "An error ocurred. Please try again later."
+        "Your steam URL appears to be invalid. Please double check the URL and try again."
       );
     }
-    const data = response.data;
-    const playerData = data.response.players[0];
-    if (!playerData.lobbysteamid || !playerData.gameid) {
-      return await interaction.reply(
-        "Player appears to not be in a lobby currently."
-      );
-    }
-    const steamURL = `steam://joinlobby/${playerData.gameid}/${playerData.lobbysteamid}/${playerData.steamid}`;
 
-    const BASE_URL =
-      "https://frostemanneogard.github.io/uri-redirector/?uri=" + steamURL;
+    const inviteURL = isValidInviteLink
+      ? steamURL
+      : getSteamInviteLinkFromProfileURL(steamURL);
+
     const responseEmbed = new EmbedBuilder()
       .setTitle("Steam Invitation")
       .setColor(main_color)
@@ -82,13 +57,15 @@ module.exports = {
       });
     const joinButton = new ButtonBuilder()
       .setLabel("Join Lobby")
-      .setURL(BASE_URL)
+      .setURL(inviteURL)
       .setStyle(ButtonStyle.Link);
     const row = new ActionRowBuilder().addComponents(joinButton);
     const message = await interaction.reply({
       embeds: [responseEmbed],
       components: [row],
     });
+
+    const neverExpire = interaction.options.getBoolean("neverexpire");
     if (neverExpire == true) {
       return;
     }
@@ -104,7 +81,7 @@ module.exports = {
     try {
       await message.awaitMessageComponent({
         filter: collectorFilter,
-        time: 120_000,
+        time: 300_000,
       });
     } catch (e) {
       await interaction.editReply({ embeds: [timeoutEmbed], components: [] });
