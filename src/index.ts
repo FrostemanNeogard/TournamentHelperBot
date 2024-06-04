@@ -1,19 +1,44 @@
 import "dotenv/config";
-import { Client, GatewayIntentBits } from "discord.js";
-import { refreshCommands } from "./util/functions";
+import { Events, IntentsBitField, Interaction } from "discord.js";
+import { Client } from "discordx";
+import { dirname, importx } from "@discordx/importer";
+
+const { TOKEN, DEV, TEST_GUILD_ID } = process.env;
 
 const client = new Client({
+  botId: "test",
   intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
+    IntentsBitField.Flags.Guilds,
+    IntentsBitField.Flags.GuildMessages,
+    IntentsBitField.Flags.MessageContent,
   ],
+  botGuilds: DEV ? [TEST_GUILD_ID ?? ""] : undefined,
 });
 
-client.on("ready", async (c) => {
-  await refreshCommands(c);
+client.once(Events.ClientReady, async () => {
+  await client.initApplicationCommands();
   console.log(`${client.user?.username} is now online!`);
-  console.log(await client.application?.commands.fetch());
 });
 
-client.login(process.env.TOKEN);
+client.on(Events.InteractionCreate, (interaction: Interaction) => {
+  console.log(`Interaction`);
+  client.executeInteraction(interaction);
+});
+
+async function start() {
+  console.log("importing");
+  await importx(`${dirname(import.meta.url)}/{events,commands}/**/*.{ts,js}`);
+
+  console.log("checking");
+  if (!TOKEN) {
+    throw Error("Could not find TOKEN in your environment");
+  }
+
+  console.log("logging");
+  await client.login(TOKEN);
+
+  console.log("logged");
+}
+
+console.log("starting");
+void start();
