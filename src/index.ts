@@ -21,7 +21,6 @@ client.once(Events.ClientReady, async () => {
 });
 
 client.on(Events.InteractionCreate, (interaction: Interaction) => {
-  console.log(`Interaction`);
   client.executeInteraction(interaction);
 });
 
