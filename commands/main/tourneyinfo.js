@@ -42,7 +42,7 @@ module.exports = {
 
     const responseEmbed = new EmbedBuilder()
       .setColor(main_color)
-      .setTitle("TOP 8")
+      .setTitle("Standings")
       .setFields(fields);
 
     return await interaction.reply({ embeds: [responseEmbed] });
