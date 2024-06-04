@@ -10,9 +10,11 @@ import {
   ButtonStyle,
   EmbedBuilder,
 } from "discord.js";
-import { ButtonComponent, Discord, Slash, SlashOption } from "discordx";
-import { getSteamInviteLinkFromProfileURL } from "../util/functions";
+import { Discord, Slash, SlashOption } from "discordx";
+import axios from "axios";
 import { COLORS } from "../util/config";
+
+const { STEAM_API_KEY } = process.env;
 
 @Discord()
 export class SteamInvite {
@@ -105,4 +107,33 @@ export class SteamInvite {
       await interaction.editReply({ embeds: [timeoutEmbed], components: [] });
     }
   }
+}
+
+async function getSteamInviteLinkFromProfileURL(profileURL: string) {
+  const match = profileURL.match(
+    /https:\/\/steamcommunity\.com\/profiles\/(\d+)\/$/
+  );
+
+  if (!match) {
+    return;
+  }
+
+  const steamId = match[1];
+  const response = await axios.get(
+    `https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=${STEAM_API_KEY}&format=json&steamids=${steamId}`
+  );
+
+  if (response.status != 200) {
+    console.error("An error ocurred when fetching the Steam API.");
+    return null;
+  }
+
+  const playerData = response.data.response.players[0];
+
+  if (!playerData.lobbysteamid || !playerData.gameid || !playerData.lobbysteamid) {
+    console.error("The player is not currently in a lobby.");
+    return null;
+  }
+
+  return `steam://joinlobby/${playerData.gameid}/${playerData.lobbysteamid}/${playerData.steamid}`;
 }

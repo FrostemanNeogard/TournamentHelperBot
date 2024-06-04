@@ -1,35 +1,5 @@
-import axios from "axios";
 import "dotenv/config";
 import { START_API_URL } from "./config";
-
-const STEAM_API_KEY = process.env.STEAM_API_KEY;
-
-export async function getSteamInviteLinkFromProfileURL(profileURL: string) {
-  const match = profileURL.match(
-    /https:\/\/steamcommunity\.com\/profiles\/(\d+)\/$/
-  );
-  if (!match) {
-    return;
-  }
-  const steamId = match[1];
-  const response = await axios.get(
-    `https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=${STEAM_API_KEY}&format=json&steamids=${steamId}`
-  );
-
-  if (response.status != 200) {
-    console.error("An error ocurred when fetching the Steam API.");
-    return null;
-  }
-
-  const playerData = response.data.response.players[0];
-
-  if (!playerData.lobbysteamid || !playerData.gameid || !playerData.lobbysteamid) {
-    console.error("The player is not currently in a lobby.");
-    return null;
-  }
-
-  return `steam://joinlobby/${playerData.gameid}/${playerData.lobbysteamid}/${playerData.steamid}`;
-}
 
 export function getStartSlugFromStartURL(startURL: string) {
   const parsedUrl = new URL(startURL);
