@@ -26,19 +26,16 @@ client.on(Events.InteractionCreate, (interaction: Interaction) => {
 });
 
 async function start() {
-  console.log("importing");
   await importx(`${dirname(import.meta.url)}/{events,commands}/**/*.{ts,js}`);
 
-  console.log("checking");
   if (!TOKEN) {
     throw Error("Could not find TOKEN in your environment");
   }
 
-  console.log("logging");
+  console.log("Logging in...");
   await client.login(TOKEN);
 
-  console.log("logged");
+  console.log("Logged in!");
 }
 
-console.log("starting");
 void start();
