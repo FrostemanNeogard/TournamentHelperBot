@@ -5,9 +5,9 @@ import {
   getStartEntrantsFromEventId,
   getStartEventIdFromStartSlug,
   getStartSlugFromStartURL,
-} from "../util/functions";
-import { COLORS } from "../util/config";
-import { StartPlayer } from "../__types/startgg";
+} from "../../util/functions";
+import { COLORS } from "../../util/config";
+import { StartPlayer } from "../../__types/startgg";
 
 @Discord()
 export class SteamInvite {
