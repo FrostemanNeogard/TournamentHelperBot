@@ -1,6 +1,8 @@
 import "dotenv/config";
 import { START_API_URL } from "./config";
 
+const { START_API_KEY } = process.env;
+
 export function getStartSlugFromStartURL(startURL: string) {
   const parsedUrl = new URL(startURL);
   const path = parsedUrl.pathname.replace(/^\/|\/$/g, "");
@@ -63,7 +65,7 @@ export async function fetchStartApi(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: "Bearer " + process.env.START_API_KEY,
+      Authorization: "Bearer " + START_API_KEY,
     },
     body: JSON.stringify({
       query: query,
