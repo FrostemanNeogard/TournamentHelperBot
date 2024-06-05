@@ -52,4 +52,33 @@ export class SteamInvite {
 
     await interaction.reply({ embeds: [responseEmbed] });
   }
+
+  @Slash({
+    description: "Get the event id from a given tournament link",
+  })
+  async tourneyid(
+    @SlashOption({
+      description: "Link to a start.gg tournament.",
+      name: "tournamentlink",
+      required: true,
+      type: ApplicationCommandOptionType.String,
+    })
+    startURL: string,
+    interaction: CommandInteraction
+  ): Promise<void> {
+    const startURLRegex =
+      /^https:\/\/www\.start\.gg\/tournament\/[^\/]+\/event\/[^\/]+\/?$/;
+    const isValidTournamentLink = startURLRegex.test(startURL);
+    if (!isValidTournamentLink) {
+      await interaction.reply(
+        "Your start.gg URL appears to be invalid. Please double check the URL and try again."
+      );
+      return;
+    }
+
+    const startSlug = getStartSlugFromStartURL(startURL);
+    const startEventId = await getStartEventIdFromStartSlug(startSlug);
+
+    await interaction.reply(`The id for the given tournament is: ${startEventId}`);
+  }
 }
