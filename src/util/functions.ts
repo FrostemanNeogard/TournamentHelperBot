@@ -1,15 +1,18 @@
 import "dotenv/config";
 import { START_API_URL } from "./config";
+import { StartPlayer } from "../__types/startgg";
 
 const { START_API_KEY } = process.env;
 
-export function getStartSlugFromStartURL(startURL: string) {
+export function getStartSlugFromStartURL(startURL: string): string {
   const parsedUrl = new URL(startURL);
   const path = parsedUrl.pathname.replace(/^\/|\/$/g, "");
   return path;
 }
 
-export async function getStartEventIdFromStartSlug(startSlug: string) {
+export async function getStartEventIdFromStartSlug(
+  startSlug: string
+): Promise<string> {
   const query = `
       query getEventId($slug: String) {
         event(slug: $slug) {
@@ -26,7 +29,9 @@ export async function getStartEventIdFromStartSlug(startSlug: string) {
   return data.data.event.id;
 }
 
-export async function getStartEntrantsFromEventId(eventId: string) {
+export async function getStartEntrantsFromEventId(
+  eventId: string
+): Promise<StartPlayer[]> {
   const query = `
     query EventStandings($eventId: ID!, $page: Int!, $perPage: Int!) {
       event(id: $eventId) {
@@ -60,7 +65,7 @@ export async function getStartEntrantsFromEventId(eventId: string) {
 export async function fetchStartApi(
   query: string,
   variables: { [key: string]: any }
-) {
+): Promise<{ [key: string]: any }> {
   const response = await fetch(START_API_URL, {
     method: "POST",
     headers: {
