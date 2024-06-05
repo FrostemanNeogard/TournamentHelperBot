@@ -11,6 +11,9 @@ import { StartPlayer } from "../../__types/startgg";
 
 @Discord()
 export class SteamInvite {
+  readonly startURLRegex: RegExp =
+    /^https:\/\/www\.start\.gg\/tournament\/[^\/]+\/event\/[^\/]+\/?$/;
+
   @Slash({
     description: "Get info from a given tournament",
   })
@@ -24,9 +27,7 @@ export class SteamInvite {
     startURL: string,
     interaction: CommandInteraction
   ): Promise<void> {
-    const startURLRegex =
-      /^https:\/\/www\.start\.gg\/tournament\/[^\/]+\/event\/[^\/]+\/?$/;
-    const isValidTournamentLink = startURLRegex.test(startURL);
+    const isValidTournamentLink = this.startURLRegex.test(startURL);
     if (!isValidTournamentLink) {
       await interaction.reply(
         "Your start.gg URL appears to be invalid. Please double check the URL and try again."
@@ -66,9 +67,7 @@ export class SteamInvite {
     startURL: string,
     interaction: CommandInteraction
   ): Promise<void> {
-    const startURLRegex =
-      /^https:\/\/www\.start\.gg\/tournament\/[^\/]+\/event\/[^\/]+\/?$/;
-    const isValidTournamentLink = startURLRegex.test(startURL);
+    const isValidTournamentLink = this.startURLRegex.test(startURL);
     if (!isValidTournamentLink) {
       await interaction.reply(
         "Your start.gg URL appears to be invalid. Please double check the URL and try again."
