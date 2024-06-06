@@ -71,6 +71,7 @@ query EventStandings($eventId: ID!, $page: Int, $perPage: Int) {
     state
     sets(page: $page, perPage: $perPage) {
       nodes {
+        id
         stream {
           enabled
           streamName
@@ -102,6 +103,7 @@ query EventStandings($eventId: ID!, $page: Int, $perPage: Int) {
   const formattedSets: StartSet[] = data.data.event.sets.nodes.map(
     (tournamentSet: { [key: string]: any }) => {
       return {
+        id: tournamentSet.id,
         stream: {
           enabled: tournamentSet.stream?.enabled,
           link: `https://www.twitch.tv/${tournamentSet.stream?.streamName}`,

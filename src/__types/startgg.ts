@@ -9,6 +9,7 @@ export type StartPlayer = {
 };
 
 export type StartSet = {
+  id: number;
   stream: {
     enabled: boolean;
     link: string;
