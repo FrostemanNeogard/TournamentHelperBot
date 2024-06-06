@@ -11,7 +11,7 @@ import { COLORS } from "../../util/config";
 import { StartPlayer, StartSet } from "../../__types/startgg";
 
 @Discord()
-export class SteamInvite {
+export class TourneyInfo {
   readonly startURLRegex: RegExp =
     /^https:\/\/www\.start\.gg\/tournament\/[^\/]+\/event\/[^\/]+\/?$/;
 
