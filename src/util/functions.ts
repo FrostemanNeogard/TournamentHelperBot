@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { START_API_URL } from "./config";
-import { StartPlayer } from "../__types/startgg";
+import { StartPlayer, StartSet } from "../__types/startgg";
 
 const { START_API_KEY } = process.env;
 
@@ -60,6 +60,68 @@ export async function getStartEntrantsFromEventId(
 
   const data = await fetchStartApi(query, variables);
   return data.data.event.standings.nodes;
+}
+
+export async function getStartSetsFromEventId(eventId: string): Promise<StartSet[]> {
+  const query = `
+query EventStandings($eventId: ID!, $page: Int, $perPage: Int) {
+  event(id: $eventId) {
+    id
+    name
+    state
+    sets(page: $page, perPage: $perPage) {
+      nodes {
+        stream {
+          enabled
+          streamName
+          streamSource
+        }
+        round
+        state
+        slots(includeByes: false) {
+          standing {
+            stats {
+              score {
+                value
+              }
+            }
+          }
+          entrant {
+            name
+          }
+        }
+      }
+    }
+  }
+}`;
+  const variables = {
+    eventId: eventId,
+  };
+  const data = await fetchStartApi(query, variables);
+
+  const formattedSets: StartSet[] = data.data.event.sets.nodes.map(
+    (tournamentSet: { [key: string]: any }) => {
+      return {
+        stream: {
+          enabled: tournamentSet.stream?.enabled,
+          link: `https://www.twitch.tv/${tournamentSet.stream?.streamName}`,
+        },
+        round: tournamentSet.round,
+        state: tournamentSet.state,
+        players: tournamentSet.slots.map((player: { [key: string]: any }) => {
+          if (player.standing == null || player.entrant == null) {
+            return;
+          }
+          return {
+            score: player.standing.stats.score.value ?? -1,
+            name: player.entrant.name,
+          };
+        }),
+      };
+    }
+  );
+
+  return formattedSets;
 }
 
 export async function fetchStartApi(
