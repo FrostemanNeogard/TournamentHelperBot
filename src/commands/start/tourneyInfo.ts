@@ -109,22 +109,25 @@ export class SteamInvite {
     // console.log(tournamentSets);
     const tournamentSet: StartSet = tournamentSets[1];
 
-    const responseEmbed = new EmbedBuilder().setTitle("Set data").setFields(
-      {
-        name: tournamentSet.players[0].name ?? "N/A",
-        value: tournamentSet.players[0].score.toString(),
-        inline: true,
-      },
-      {
-        name: tournamentSet.players[1].name ?? "N/A",
-        value: tournamentSet.players[1].score.toString(),
-        inline: true,
-      },
-      {
-        name: "Stream Link",
-        value: tournamentSet.stream.link ?? "Not enabled.",
-      }
-    );
+    const responseEmbed = new EmbedBuilder()
+      .setTitle(`Set data for ${tournamentSet.id.toString()}`)
+      .setColor(COLORS.main)
+      .setFields(
+        {
+          name: tournamentSet.players[0].name ?? "N/A",
+          value: tournamentSet.players[0].score.toString(),
+          inline: true,
+        },
+        {
+          name: tournamentSet.players[1].name ?? "N/A",
+          value: tournamentSet.players[1].score.toString(),
+          inline: true,
+        },
+        {
+          name: "Stream Link",
+          value: tournamentSet.stream.link ?? "Stream not enabled.",
+        }
+      );
 
     await interaction.reply({ embeds: [responseEmbed] });
   }
