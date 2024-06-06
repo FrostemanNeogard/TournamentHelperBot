@@ -4,10 +4,11 @@ import { Discord, Slash, SlashOption } from "discordx";
 import {
   getStartEntrantsFromEventId,
   getStartEventIdFromStartSlug,
+  getStartSetsFromEventId,
   getStartSlugFromStartURL,
 } from "../../util/functions";
 import { COLORS } from "../../util/config";
-import { StartPlayer } from "../../__types/startgg";
+import { StartPlayer, StartSet } from "../../__types/startgg";
 
 @Discord()
 export class SteamInvite {
@@ -79,5 +80,52 @@ export class SteamInvite {
     const startEventId = await getStartEventIdFromStartSlug(startSlug);
 
     await interaction.reply(`The id for the given tournament is: ${startEventId}`);
+  }
+
+  @Slash({
+    description: "Get information of a given set",
+  })
+  async setinfo(
+    @SlashOption({
+      description: "Link to a start.gg tournament.",
+      name: "tournamentlink",
+      required: true,
+      type: ApplicationCommandOptionType.String,
+    })
+    startURL: string,
+    interaction: CommandInteraction
+  ): Promise<void> {
+    const isValidTournamentLink = this.startURLRegex.test(startURL);
+    if (!isValidTournamentLink) {
+      await interaction.reply(
+        "Your start.gg URL appears to be invalid. Please double check the URL and try again."
+      );
+      return;
+    }
+
+    const startSlug = getStartSlugFromStartURL(startURL);
+    const eventId = await getStartEventIdFromStartSlug(startSlug);
+    const tournamentSets: StartSet[] = await getStartSetsFromEventId(eventId);
+    // console.log(tournamentSets);
+    const tournamentSet: StartSet = tournamentSets[1];
+
+    const responseEmbed = new EmbedBuilder().setTitle("Set data").setFields(
+      {
+        name: tournamentSet.players[0].name ?? "N/A",
+        value: tournamentSet.players[0].score.toString(),
+        inline: true,
+      },
+      {
+        name: tournamentSet.players[1].name ?? "N/A",
+        value: tournamentSet.players[1].score.toString(),
+        inline: true,
+      },
+      {
+        name: "Stream Link",
+        value: tournamentSet.stream.link ?? "Not enabled.",
+      }
+    );
+
+    await interaction.reply({ embeds: [responseEmbed] });
   }
 }
