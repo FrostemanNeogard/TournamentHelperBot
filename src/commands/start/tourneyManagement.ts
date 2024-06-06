@@ -8,7 +8,7 @@ export class TourneyManagement {
     /^https:\/\/www\.start\.gg\/tournament\/[^\/]+\/event\/[^\/]+\/?$/;
 
   @Slash({
-    description: "Update the set ",
+    description: "Update the data for a given set by ID.",
   })
   async updateset(
     @SlashOption({
