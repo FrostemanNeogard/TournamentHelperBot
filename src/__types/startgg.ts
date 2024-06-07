@@ -27,8 +27,12 @@ type GraphqlErrorContent = { [key: string]: any };
 export type GraphqlError = { errors: GraphqlErrorContent[] } | undefined;
 
 export type StartSetReportData = {
-  gameNum: number;
   newPlayerOneScore: number;
   newPlayerTwoScore: number;
   winnerId?: number;
+};
+
+export type StartSetReportDataGame = {
+  gameNum: number;
+  winnerId: number;
 };
