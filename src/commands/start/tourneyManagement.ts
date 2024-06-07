@@ -37,7 +37,7 @@ export class TourneyManagement {
 
     responseEmbed
       .setColor(COLORS.main)
-      .setTitle("Success")
+      .setTitle("Reset Set")
       .setFooter({ text: `Set ID: ${setId}` })
       .setFields({
         name: "Success!",
@@ -82,7 +82,7 @@ export class TourneyManagement {
     };
 
     const errors: GraphqlError = await reportSetById(setId, gameData);
-    if (errors) {
+    if (errors?.errors) {
       responseEmbed
         .setColor(COLORS.danger)
         .setTitle("Reset Set")
@@ -96,7 +96,7 @@ export class TourneyManagement {
 
     responseEmbed
       .setColor(COLORS.main)
-      .setTitle("Success")
+      .setTitle("Report Set")
       .setFooter({ text: `Set ID: ${setId}` })
       .setFields({
         name: "Success!",
