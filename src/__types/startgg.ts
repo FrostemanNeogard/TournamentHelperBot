@@ -25,3 +25,10 @@ export type StartSet = {
 type GraphqlErrorContent = { [key: string]: any };
 
 export type GraphqlError = { errors: GraphqlErrorContent[] } | undefined;
+
+export type StartSetReportData = {
+  gameNum: number;
+  newPlayerOneScore: number;
+  newPlayerTwoScore: number;
+  winnerId?: number;
+};
