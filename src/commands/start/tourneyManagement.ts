@@ -71,14 +71,37 @@ export class TourneyManagement {
       type: ApplicationCommandOptionType.Number,
     })
     playerTwoScore: number,
+    @SlashOption({
+      description:
+        "If set to true, will report the set as complete, otherwise only updates score",
+      name: "finished",
+      required: false,
+      type: ApplicationCommandOptionType.Boolean,
+    })
+    finished: number,
     interaction: CommandInteraction
   ): Promise<void> {
     const responseEmbed = new EmbedBuilder();
 
+    const players = {
+      playerOne: {
+        newScore: playerOneScore,
+        id: 16836651,
+      },
+      playerTwo: {
+        newScore: playerTwoScore,
+        id: 16836650,
+      },
+    };
+
     const gameData: StartSetReportData = {
-      gameNum: 3,
-      newPlayerOneScore: playerOneScore,
-      newPlayerTwoScore: playerTwoScore,
+      playerOne: players.playerOne,
+      playerTwo: players.playerTwo,
+      winnerId: !finished
+        ? undefined
+        : playerOneScore > playerTwoScore
+        ? players.playerOne.id
+        : players.playerTwo.id,
     };
 
     const errors: GraphqlError = await reportSetById(setId, gameData);
