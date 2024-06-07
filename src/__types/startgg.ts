@@ -21,3 +21,7 @@ export type StartSet = {
     score: number;
   }[];
 };
+
+type GraphqlErrorContent = { [key: string]: any };
+
+export type GraphqlError = { errors: GraphqlErrorContent[] } | undefined;
