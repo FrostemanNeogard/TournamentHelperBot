@@ -2,6 +2,8 @@ import "dotenv/config";
 import { START_API_URL } from "./config";
 import {
   GraphqlError,
+  GraphqlStartEntrant,
+  StartEntrant,
   StartPlayer,
   StartSet,
   StartSetReportData,
@@ -9,6 +11,7 @@ import {
 } from "../__types/startgg";
 import {
   queryEntrantsFromEventId,
+  queryEntrantsFromSetId,
   queryEventIdFromSlug,
   querySetsFromEventId,
 } from "./graphqlQueries";
@@ -110,6 +113,23 @@ export async function reportSetById(
 
   const response = await fetchStartApi(mutationReportSet, variables);
   return response?.errors;
+}
+
+export async function getEntrantsInSetBySetId(
+  setId: string
+): Promise<StartEntrant[]> {
+  const variables = {
+    setId: setId,
+  };
+
+  const response = await fetchStartApi(queryEntrantsFromSetId, variables);
+  const entrants = response.data.set.slots.map((player: GraphqlStartEntrant) => {
+    return {
+      id: player.entrant.id,
+      name: player.entrant.name,
+    };
+  });
+  return entrants;
 }
 
 export async function fetchStartApi(
