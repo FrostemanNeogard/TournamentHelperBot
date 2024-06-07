@@ -5,6 +5,7 @@ import {
   StartPlayer,
   StartSet,
   StartSetReportData,
+  StartSetReportDataGame,
 } from "../__types/startgg";
 import {
   queryEntrantsFromEventId,
@@ -88,14 +89,23 @@ export async function resetSetById(setId: string): Promise<GraphqlError> {
 
 export async function reportSetById(
   setId: string,
-  gameData: StartSetReportData
+  setData: StartSetReportData
 ): Promise<GraphqlError> {
+  const totalGamesPlayed = setData.playerOne.newScore + setData.playerTwo.newScore;
+
+  const gamesData: StartSetReportDataGame[] = [];
+  for (let i = 0; i < totalGamesPlayed; i++) {
+    gamesData.push({
+      gameNum: i,
+      winnerId:
+        i < setData.playerOne.newScore ? setData.playerOne.id : setData.playerTwo.id,
+    });
+  }
+
   const variables = {
     setId: setId,
-    winnerId: gameData.winnerId,
-    gameNum: gameData.gameNum,
-    entrant1Score: gameData.newPlayerOneScore,
-    entrant2Score: gameData.newPlayerTwoScore,
+    winnerId: setData.winnerId,
+    gameData: gamesData,
   };
 
   const response = await fetchStartApi(mutationReportSet, variables);
