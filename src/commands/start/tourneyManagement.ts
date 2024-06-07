@@ -7,9 +7,6 @@ import { GraphqlError, StartSetReportData } from "../../__types/startgg";
 
 @Discord()
 export class TourneyManagement {
-  readonly startURLRegex: RegExp =
-    /^https:\/\/www\.start\.gg\/tournament\/[^\/]+\/event\/[^\/]+\/?$/;
-
   @Slash({
     description: "Reset a given set by ID.",
   })
