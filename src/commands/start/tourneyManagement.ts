@@ -46,13 +46,6 @@ export class TourneyManagement {
   })
   async resetset(
     @SlashOption({
-      description: "Link to a start.gg tournament.",
-      name: "tournamentlink",
-      required: true,
-      type: ApplicationCommandOptionType.String,
-    })
-    startURL: string,
-    @SlashOption({
       description: "ID of the set you want to reset.",
       name: "setid",
       required: true,
@@ -61,14 +54,6 @@ export class TourneyManagement {
     setId: string,
     interaction: CommandInteraction
   ): Promise<void> {
-    const isValidTournamentLink = this.startURLRegex.test(startURL);
-    if (!isValidTournamentLink) {
-      await interaction.reply(
-        "Your start.gg URL appears to be invalid. Please double check the URL and try again."
-      );
-      return;
-    }
-
     const responseEmbed = new EmbedBuilder();
 
     const errors: GraphqlError = await resetSetById(setId);
