@@ -1,6 +1,10 @@
 export type StartEntrant = {
-  id: string;
+  id: number;
   name: string;
+};
+
+export type GraphqlStartEntrant = {
+  entrant: StartEntrant;
 };
 
 export type StartPlayer = {
