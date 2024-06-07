@@ -1,11 +1,12 @@
 import "dotenv/config";
 import { START_API_URL } from "./config";
-import { StartPlayer, StartSet } from "../__types/startgg";
+import { GraphqlError, StartPlayer, StartSet } from "../__types/startgg";
 import {
   queryEntrantsFromEventId,
   queryEventIdFromSlug,
   querySetsFromEventId,
 } from "./graphqlQueries";
+import { mutationResetSet } from "./graphqlMutations";
 
 const { START_API_KEY } = process.env;
 
@@ -69,6 +70,15 @@ export async function getStartSetsFromEventId(eventId: string): Promise<StartSet
   );
 
   return formattedSets;
+}
+
+export async function resetSetById(setId: string): Promise<GraphqlError> {
+  const variables = {
+    setId: setId,
+  };
+
+  const response = await fetchStartApi(mutationResetSet, variables);
+  return response?.errors;
 }
 
 export async function fetchStartApi(
