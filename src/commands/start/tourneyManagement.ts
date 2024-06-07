@@ -1,9 +1,17 @@
 import type { CommandInteraction } from "discord.js";
 import { ApplicationCommandOptionType, EmbedBuilder } from "discord.js";
 import { Discord, Slash, SlashOption } from "discordx";
-import { reportSetById, resetSetById } from "../../util/functions";
+import {
+  getEntrantsInSetBySetId,
+  reportSetById,
+  resetSetById,
+} from "../../util/functions";
 import { COLORS } from "../../util/config";
-import { GraphqlError, StartSetReportData } from "../../__types/startgg";
+import {
+  GraphqlError,
+  StartEntrant,
+  StartSetReportData,
+} from "../../__types/startgg";
 
 @Discord()
 export class TourneyManagement {
@@ -83,14 +91,16 @@ export class TourneyManagement {
   ): Promise<void> {
     const responseEmbed = new EmbedBuilder();
 
+    const entrants: StartEntrant[] = await getEntrantsInSetBySetId(setId);
+
     const players = {
       playerOne: {
         newScore: playerOneScore,
-        id: 16836651,
+        id: entrants[0].id,
       },
       playerTwo: {
         newScore: playerTwoScore,
-        id: 16836650,
+        id: entrants[1].id,
       },
     };
 
