@@ -104,7 +104,6 @@ export class TourneyInfo {
     const startSlug = getStartSlugFromStartURL(startURL);
     const eventId = await getStartEventIdFromStartSlug(startSlug);
     const tournamentSets: StartSet[] = await getStartSetsFromEventId(eventId);
-    // console.log(tournamentSets);
     const tournamentSet: StartSet = tournamentSets[1];
 
     const responseEmbed = new EmbedBuilder()
