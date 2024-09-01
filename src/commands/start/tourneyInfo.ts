@@ -9,12 +9,10 @@ import {
 } from "../../util/functions";
 import { COLORS } from "../../util/config";
 import { StartPlayer, StartSet } from "../../__types/startgg";
+import { startURLRegex } from "../../util/contants";
 
 @Discord()
 export class TourneyInfo {
-  readonly startURLRegex: RegExp =
-    /^https:\/\/www\.start\.gg\/tournament\/[^\/]+\/event\/[^\/]+\/?$/;
-
   @Slash({
     description: "Get info from a given tournament",
   })
@@ -28,7 +26,7 @@ export class TourneyInfo {
     startURL: string,
     interaction: CommandInteraction
   ): Promise<void> {
-    const isValidTournamentLink = this.startURLRegex.test(startURL);
+    const isValidTournamentLink = startURLRegex.test(startURL);
     if (!isValidTournamentLink) {
       await interaction.reply(
         "Your start.gg URL appears to be invalid. Please double check the URL and try again."
@@ -68,7 +66,7 @@ export class TourneyInfo {
     startURL: string,
     interaction: CommandInteraction
   ): Promise<void> {
-    const isValidTournamentLink = this.startURLRegex.test(startURL);
+    const isValidTournamentLink = startURLRegex.test(startURL);
     if (!isValidTournamentLink) {
       await interaction.reply(
         "Your start.gg URL appears to be invalid. Please double check the URL and try again."
@@ -95,7 +93,7 @@ export class TourneyInfo {
     startURL: string,
     interaction: CommandInteraction
   ): Promise<void> {
-    const isValidTournamentLink = this.startURLRegex.test(startURL);
+    const isValidTournamentLink = startURLRegex.test(startURL);
     if (!isValidTournamentLink) {
       await interaction.reply(
         "Your start.gg URL appears to be invalid. Please double check the URL and try again."
@@ -106,7 +104,6 @@ export class TourneyInfo {
     const startSlug = getStartSlugFromStartURL(startURL);
     const eventId = await getStartEventIdFromStartSlug(startSlug);
     const tournamentSets: StartSet[] = await getStartSetsFromEventId(eventId);
-    // console.log(tournamentSets);
     const tournamentSet: StartSet = tournamentSets[1];
 
     const responseEmbed = new EmbedBuilder()

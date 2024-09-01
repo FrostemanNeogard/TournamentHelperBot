@@ -58,3 +58,16 @@ export const querySetsFromEventId = `
       }
     }
   }`;
+
+export const queryEntrantsFromSetId = `
+  query SetEntrants($setId: ID!) {
+    set(id: $setId) {
+      id
+      slots {
+        entrant {
+          id
+          name
+        }
+      }
+    }
+  }`;

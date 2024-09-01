@@ -1,11 +1,21 @@
 import "dotenv/config";
 import { START_API_URL } from "./config";
-import { StartPlayer, StartSet } from "../__types/startgg";
+import {
+  GraphqlError,
+  GraphqlStartEntrant,
+  StartEntrant,
+  StartPlayer,
+  StartSet,
+  StartSetReportData,
+  StartSetReportDataGame,
+} from "../__types/startgg";
 import {
   queryEntrantsFromEventId,
+  queryEntrantsFromSetId,
   queryEventIdFromSlug,
   querySetsFromEventId,
 } from "./graphqlQueries";
+import { mutationReportSet, mutationResetSet } from "./graphqlMutations";
 
 const { START_API_KEY } = process.env;
 
@@ -69,6 +79,57 @@ export async function getStartSetsFromEventId(eventId: string): Promise<StartSet
   );
 
   return formattedSets;
+}
+
+export async function resetSetById(setId: string): Promise<GraphqlError> {
+  const variables = {
+    setId: setId,
+  };
+
+  const response = await fetchStartApi(mutationResetSet, variables);
+  return response?.errors;
+}
+
+export async function reportSetById(
+  setId: string,
+  setData: StartSetReportData
+): Promise<GraphqlError> {
+  const totalGamesPlayed = setData.playerOne.newScore + setData.playerTwo.newScore;
+
+  const gamesData: StartSetReportDataGame[] = [];
+  for (let i = 0; i < totalGamesPlayed; i++) {
+    gamesData.push({
+      gameNum: i,
+      winnerId:
+        i < setData.playerOne.newScore ? setData.playerOne.id : setData.playerTwo.id,
+    });
+  }
+
+  const variables = {
+    setId: setId,
+    winnerId: setData.winnerId,
+    gameData: gamesData,
+  };
+
+  const response = await fetchStartApi(mutationReportSet, variables);
+  return response?.errors;
+}
+
+export async function getEntrantsInSetBySetId(
+  setId: string
+): Promise<StartEntrant[]> {
+  const variables = {
+    setId: setId,
+  };
+
+  const response = await fetchStartApi(queryEntrantsFromSetId, variables);
+  const entrants = response.data.set.slots.map((player: GraphqlStartEntrant) => {
+    return {
+      id: player.entrant.id,
+      name: player.entrant.name,
+    };
+  });
+  return entrants;
 }
 
 export async function fetchStartApi(

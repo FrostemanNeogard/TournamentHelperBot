@@ -1,6 +1,10 @@
 export type StartEntrant = {
-  id: string;
+  id: number;
   name: string;
+};
+
+export type GraphqlStartEntrant = {
+  entrant: StartEntrant;
 };
 
 export type StartPlayer = {
@@ -20,4 +24,25 @@ export type StartSet = {
     name: string;
     score: number;
   }[];
+};
+
+type GraphqlErrorContent = { [key: string]: any };
+
+export type GraphqlError = { errors: GraphqlErrorContent[] } | undefined;
+
+export type StartSetReportData = {
+  playerOne: {
+    newScore: number;
+    id: number;
+  };
+  playerTwo: {
+    newScore: number;
+    id: number;
+  };
+  winnerId?: number;
+};
+
+export type StartSetReportDataGame = {
+  gameNum: number;
+  winnerId: number;
 };
