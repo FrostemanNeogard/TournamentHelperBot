@@ -21,7 +21,14 @@ client.once(Events.ClientReady, async () => {
 });
 
 client.on(Events.InteractionCreate, (interaction: Interaction) => {
-  client.executeInteraction(interaction);
+  try {
+    client.executeInteraction(interaction);
+  } catch (error) {
+    console.error(
+      "An error ocurred when attempting to execute interaction. Error:",
+      error
+    );
+  }
 });
 
 async function start() {
